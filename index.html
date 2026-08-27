@@ -1,0 +1,1907 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>婷婷の次元专线</title>
+    <!-- 加载思源黑体（Google Fonts；加载失败自动回退系统中文字体，不影响功能） -->
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+    <!-- JSZip 本地化（原 cdnjs CDN 会被 Edge 跟踪防护拦截） -->
+    <script src="js/vendor/jszip.min.js"></script>
+
+</head>
+
+<body>
+
+    <!-- ====== 欢迎界面：动态粒子次元门 ====== -->
+    <div id="welcome-screen">
+        <canvas id="gate-canvas"></canvas>
+        <div class="welcome-content">
+            <div class="gate-title">
+                <span class="gate-icon">🌙</span>
+                <h1>婷婷の次元专线</h1>
+            </div>
+
+
+            <!-- 脉冲进度条 -->
+            <div class="pulse-progress">
+                <div class="pulse-percent" id="pulsePercent">0%</div>
+                <div class="pulse-track">
+                    <div class="pulse-fill" id="pulseFill">
+                        <div class="pulse-wave" id="pulseWave"></div>
+                    </div>
+                </div>
+                <div class="pulse-status" id="pulseStatus">✦ 正在开启次元通道 ✦</div>
+            </div>
+
+        </div>
+    </div>
+
+
+
+    <!-- 主聊天容器 -->
+    <div class="chat-container">
+
+        <!-- 群聊模式悬浮胶囊（absolute 脱离标题栏，悬浮在消息区上方；群聊时显示，单人是隐藏） -->
+        <div class="group-chat-header hidden" id="groupChatHeader">
+                <!-- 方案C：悬浮胶囊标题栏 -->
+                <div class="group-chat-capsule">
+                    <!-- 左侧操作按钮（方案B对称：管理 → 左） -->
+                    <div class="group-header-actions group-header-side hidden" id="groupHeaderActions">
+                        <button class="group-header-icon-btn group-manage-btn" id="groupManageBtn" title="管理群成员">
+                            <svg class="group-manage-icon" viewBox="0 0 1024 1024" xmlns="http://www.w3.org/2000/svg"><path d="M956.96497373 783.22135977c-3.28732207 17.50931455-14.60263008 28.85922598-28.7208123 28.85922598h-2.35303067c-27.68271065 0.06920684-50.10570703 22.49220234-50.17491299 50.17491386 0.3806376 6.57464414 1.90318623 13.04547715 4.42923311 19.10107002 6.74766035 15.70993857 1.59175547 33.94592402-12.35340967 43.80789024l-1.38413496 0.9342914-58.23750322 32.04273779a37.37165977 37.37165977 0 0 1-15.9521625 3.66795967c-10.93467041 0-21.73092803-4.60225107-28.58239863-12.24960029-7.50893555-8.13179619-27.37128076-24.94904326-41.35104932-24.94904238-13.66833867 0-33.87671719 16.81724707-40.93580919 24.49919883a39.34405283 39.34405283 0 0 1-43.1850287 8.96227733l-57.58003828-32.00813437c-15.15628388-10.51943028-20.45060244-29.41288066-13.56452842-44.77678506 1.21111875-2.83747763 4.39463057-11.83435927 4.39463056-18.96265635 0-27.64810722-22.5960126-50.17491387-50.2441207-50.17491386h-1.97239306c-14.46421641 0-25.71031758-11.38451484-29.06684649-28.92843281-0.51905039-2.66446055-4.94828438-26.99064316-4.94828437-46.5069542 0-19.58551787 4.42923398-43.98090732 4.94828437-46.57616104 3.35652891-17.50931455 14.60263008-28.92843281 28.7208123-28.92843281h2.35303067c27.68271065 0 50.17491387-22.38839209 50.24412071-50.07110362a56.40352383 56.40352383 0 0 0-4.46383741-19.17027685 36.26435127 36.26435127 0 0 1 12.4226165-43.84249365l1.38413584-0.83048116 59.69084502-32.80401211 1.14191192-0.44984443a39.69008701 39.69008701 0 0 1 42.80439111 8.92767393c7.26671162 7.6127458 26.81762607 23.49570059 40.34755195 23.49570146 13.32230449 0 32.76940869-15.53692148 40.03612031-23.11506386 11.31530801-11.17689434 28.20176192-14.53342325 42.90820137-8.54703721l58.61814082 32.42337539c15.22549073 10.51943028 20.5544127 29.4820875 13.63373526 44.8459919a59.06798438 59.06798438 0 0 0-4.32542373 18.99725976c0.06920684 27.64810722 22.49220234 50.0365002 50.17491299 50.07110362h2.00699648c14.42961299 0 25.71031758 11.38451484 29.06684649 28.96303623 0.48444785 2.62985713 4.94828438 26.95603974 4.94828524 46.57616102 0 20.58901612-4.94828438 46.33393711-4.87907841 46.54155763z m-43.70407998-77.30396983a95.74757666 95.74757666 0 0 1-83.29035586-94.88249209c0.17301709-9.89656875 1.90318623 19.65472471 5.12130146-28.99763965l-41.48946299-23.04585615a170.87153291 170.87153291 0 0 1-17.12867695 13.84135488c-18.1321752 12.73404727-35.43387011 19.17027685-51.6974625 19.17027774-16.50581631 0-34.01513086-6.43623047-52.21651376-19.51631103a149.83267237 149.83267237 0 0 1-17.16328038-14.22199336l-43.39265009 23.84173476c2.4222375 7.19750479 5.15590488 17.82074531 5.15590488 28.96303623a95.85138604 95.85138604 0 0 1-83.35956269 94.95169893 226.82521231 226.82521231 0 0 0-2.87208106 30.65860195c0.27682734 10.24260292 1.21111875 20.45060244 2.87208106 30.58939512a95.71297324 95.71297324 0 0 1 83.35956269 94.95169892c0 11.07308408-2.83747763 21.76553144-5.19050831 28.99763965l40.13993145 22.42299551c5.43273223-5.1905083 11.14229092-10.03498242 17.16328037-14.49881982 18.40900253-13.42611474 36.29895469-20.34679219 52.97778809-20.34679219 16.92105732 0 34.94942227 7.05909112 53.53144189 20.79663662 6.05559287 4.53304424 11.83435927 9.48132862 17.26709151 14.77564628l42.00851338-23.1496664a95.02090489 95.02090489 0 0 1-5.08669805-28.96303623 95.67836982 95.67836982 0 0 1 83.29035586-94.95169893c1.17651533-7.92417568 2.87208106-20.72742979 2.87208193-30.69320537 0-10.00037901-1.69556573-22.73442627-2.87208193-30.69320537z m-190.73387724 118.9664499a88.75769151 88.75769151 0 0 1-88.61927872-88.58467529 88.65388125 88.65388125 0 0 1 177.23855655 0 88.75769151 88.75769151 0 0 1-88.61927783 88.58467529z m0-129.76270752c-23.04585703 0-42.00851338 18.20138203-42.97740909 41.21263565a42.9774082 42.9774082 0 0 0 85.92021387 0 43.01201162 43.01201162 0 0 0-42.94280478-41.21263565z m-128.58619219-225.61409355l-14.42961299 11.21149776c-29.37827724 26.12555859-85.43576602 34.84561201-122.4959959 37.71769394l-4.74066387-0.10381026a344.64975029 344.64975029 0 0 0-31.21225664 1.48794522h-0.44984443l0.06920683 0.06920684c-167.65341768 15.81374883-299.28470801 156.30350625-299.284708 326.93281611v50.14030957h367.38417656a298.76565674 298.76565674 0 0 0 35.81450771 58.61814082H91.77644902A29.4820875 29.4820875 0 0 1 62.15594785 926.30637178v-79.4839834c0-159.10638047 96.47424756-300.18439599 245.85707637-359.42539746l16.92105732-6.6784544-14.36040615-11.21149775c-56.12669648-43.77328682-88.23864112-109.06988115-88.23864112-179.31475986 0-125.74871455 103.11809766-228.03633106 229.87031046-228.03633106 126.78681622 0 229.90491386 102.28761651 229.9741207 228.03633106 0 70.24487871-32.2503583 135.54147305-88.23864111 179.31475986zM452.23994815 120.80869209c-94.08661347 0-170.62930898 76.02364511-170.62930899 169.38358682 0 93.42914941 76.5426955 169.45279365 170.62930899 169.45279453 94.1212169 0 170.6639124-75.9890417 170.6639124-169.45279453 0-93.42914941-76.5426955-169.38358682-170.6639124-169.38358682z"></path></svg>
+                        </button>
+                    </div>
+                    <!-- 中间：名称 + 人数徽章 + 副标题 + 成员头像（方案B对称：居中） -->
+                    <div class="group-capsule-center">
+                        <div class="group-capsule-name-row">
+                            <span class="group-chat-name" id="groupChatName">聊天室</span>
+                            <span class="group-chat-member-count" id="groupChatMemberCount">6 人</span>
+                        </div>
+                        <div class="group-capsule-avatars" id="groupCapsuleAvatars">
+                            <!-- 成员头像由 JS 渲染（全部成员，单行不换行） -->
+                        </div>
+                    </div>
+                    <!-- 右侧操作按钮（方案B对称：退出 → 右） -->
+                    <div class="group-header-actions group-header-side hidden">
+                        <button class="group-header-icon-btn group-exit-btn" id="exitGroupBtn" title="退出群聊">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                                stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
+                                <polyline points="16 17 21 12 16 7" />
+                                <line x1="21" y1="12" x2="9" y2="12" />
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 顶部标题栏（仅单人聊天模式可见；群聊时 .group-mode 下塌缩隐藏） -->
+            <div class="chat-header">
+                <!-- 左侧：联系人头像 + 名字 -->
+                <div class="partner-info" id="partnerInfo">
+                    <div class="partner-avatar" id="partnerAvatar">
+                        <svg viewBox="0 0 24 24" fill="currentColor">
+                            <path
+                                d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z" />
+                        </svg>
+                    </div>
+                    <!-- 名字 + 下拉图标 横向一行 -->
+                    <div class="partner-name-row">
+                        <span class="partner-name" id="contactName">联系人</span>
+                        <div class="partner-switch-btn" id="partnerSwitchBtn" title="切换联系人">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <circle cx="12" cy="8" r="4" />
+                                <path d="M5 20v-2a7 7 0 0 1 14 0v2" />
+                            </svg>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 下拉切换联系人列表 -->
+                <div class="partner-dropdown hidden" id="partnerDropdown">
+                <div class="partner-dropdown-list" id="partnerDropdownList">
+                    <!-- 由 JS 动态渲染 -->
+                </div>
+            </div>
+
+            <!-- 右侧：用户自己的头像 + 名字 -->
+            <div class="user-info">
+                <div class="user-avatar" id="userAvatar">
+                    <svg viewBox="0 0 24 24" fill="currentColor">
+                        <path
+                            d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z" />
+                    </svg>
+                </div>
+                <span class="user-name" id="myName">我</span>
+            </div>
+        </div>
+
+        <!-- 轻提示容器（无可用字卡时显示） -->
+        <div class="toast-container" id="toastContainer"></div>
+
+        <!-- ===== 新增：聊天主体容器，占满剩余高度，内部 flex 列 ===== -->
+        <div class="chat-body">
+            <!-- 消息区域 -->
+            <div class="message-area" id="messageArea">
+                <!-- 消息会动态插入到这里 -->
+            </div>
+
+            <!-- ====== 回到底部按钮（在输入框上方） ====== -->
+            <div class="scroll-to-bottom-wrapper" id="scrollToBottomWrapper">
+                <button class="scroll-to-bottom-btn" id="scrollToBottomBtn" title="回到底部">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <line x1="4" y1="20" x2="20" y2="20" />
+                        <polyline points="12 4 12 14" />
+                        <polyline points="8 10 12 14 16 10" />
+                    </svg>
+                </button>
+            </div>
+
+            <!-- 底部包裹层：输入区域 + 功能面板 -->
+            <div class="bottom-wrapper">
+                <!-- 底部输入区域 -->
+                <div class="input-area">
+
+                    <!-- 引用条（引用消息时显示） -->
+                    <div class="quote-bar hidden" id="quoteBar">
+                        <div class="quote-bar-content">
+                            <span class="quote-bar-text" id="quoteBarText">引用：消息内容</span>
+                        </div>
+                        <button class="quote-bar-close" id="quoteBarClose">✕</button>
+                    </div>
+
+                    <!-- 正在输入提示（小胶囊，浮动在输入区域上方） -->
+                    <div class="typing-indicator" id="typingIndicator">
+                        <div class="typing-avatar" id="typingAvatar"></div>
+                        <span class="typing-name" id="typingName"></span>
+                        <span class="typing-text" id="typingText">正在输入</span>
+                        <span class="typing-dots">
+                            <span></span>
+                            <span></span>
+                            <span></span>
+                        </span>
+                    </div>
+
+                    <button class="input-btn" id="emojiBtn" title="表情">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                            stroke-linecap="round" stroke-linejoin="round">
+                            <circle cx="12" cy="12" r="10" />
+                            <path d="M8 14s1.5 2 4 2 4-2 4-2" />
+                            <line x1="9" y1="9" x2="9.01" y2="9" />
+                            <line x1="15" y1="9" x2="15.01" y2="9" />
+                        </svg>
+                    </button>
+
+                    <!-- 多人聊天按钮（表情按钮右侧） -->
+                    <button class="input-btn" id="groupChatBtn" title="多人聊天">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                            stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
+                            <circle cx="9" cy="7" r="4" />
+                            <path d="M23 21v-2a4 4 0 0 0-3-3.87" />
+                            <path d="M16 3.13a4 4 0 0 1 0 7.75" />
+                        </svg>
+                    </button>
+
+                    <!-- 表情选择面板 -->
+                    <div class="emoji-picker" id="emojiPicker">
+                        <!-- 顶部：下拉切换 -->
+                        <div class="emoji-picker-header">
+                            <div class="emoji-lib-switch" id="emojiPickerSwitch" title="切换库">
+                                <span id="emojiPickerSwitchLabel">通用</span>
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <polyline points="6 9 12 15 18 9" />
+                                </svg>
+                            </div>
+                            <!-- 下拉菜单 -->
+                            <div class="emoji-picker-dropdown hidden" id="emojiPickerDropdown">
+                                <div class="emoji-picker-dropdown-list" id="emojiPickerDropdownList"></div>
+                            </div>
+                        </div>
+
+                        <!-- 表情包网格 -->
+                        <div class="emoji-picker-body">
+                            <div class="emoji-picker-grid" id="emojiPickerGrid">
+                                <div class="sticker-empty">请先添加表情包</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 输入框包裹容器（用于定位右下角提示文字） -->
+                    <div class="input-wrapper">
+                        <textarea class="message-input" id="messageInput" placeholder="" spellcheck="false"
+                            rows="1"></textarea>
+                        <!-- 右下角快捷键提示（输入框为空时显示，打字时自动消失） -->
+                        <span class="input-hint" id="inputHint">Ctrl + Enter 发送</span>
+                    </div>
+
+                    <button class="send-btn" id="sendBtn" title="发送">
+                        <svg viewBox="0 0 1024 1024" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M931.392 11.264L45.12 530.688c-28.736 16.896-43.52 39.424-45.12 61.248v8.128c2.048 26.112 23.04 49.984 61.632 60.416l171.968 46.592a34.304 34.304 0 0 0 41.28-25.536 35.584 35.584 0 0 0-23.808-43.136L79.68 592l873.408-511.872-95.232 703.488c-1.408 10.432-9.152 15.68-18.752 12.992l-365.632-100.288 296.32-305.856a36.416 36.416 0 0 0 0-50.24 33.728 33.728 0 0 0-48.704 0l-324.8 335.36a110.72 110.72 0 0 0-7.872 9.088 35.52 35.52 0 0 0-16.128 30.784 104 104 0 0 0-5.248 32.64v206.4c0 49.664 53.568 79.168 93.568 51.712l166.272-114.368c10.24-6.976 16-19.136 15.232-31.872a35.712 35.712 0 0 0-19.2-29.504 33.28 33.28 0 0 0-34.24 2.304L435.84 937.856v-178.432l385.472 105.6c49.6 13.632 97.472-19.072 104.576-71.808l97.152-717.568c8.448-60.48-40-94.72-91.648-64.384z"/>
+                        </svg>
+                    </button>
+                    <button class="plus-btn" id="plusBtn" title="功能面板">
+                        <svg viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                            fill="none">
+                            <circle cx="12" cy="12" r="10" />
+                            <line x1="12" y1="8" x2="12" y2="16" />
+                            <line x1="8" y1="12" x2="16" y2="12" />
+                        </svg>
+                    </button>
+                </div>
+
+                <!-- 功能面板 -->
+                <div class="function-panel" id="functionPanel">
+                    <!-- 字卡库 -->
+                    <div class="function-item">
+                        <div class="function-icon">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                                stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M4 4h16v16H4z" />
+                                <line x1="8" y1="8" x2="16" y2="8" />
+                                <line x1="8" y1="12" x2="16" y2="12" />
+                                <line x1="8" y1="16" x2="12" y2="16" />
+                            </svg>
+                        </div>
+                        <span>字卡库</span>
+                    </div>
+
+                    <!-- 联系人管理 -->
+                    <div class="function-item">
+                        <div class="function-icon">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"
+                                stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
+                                <circle cx="9" cy="7" r="4" />
+                                <path d="M23 21v-2a4 4 0 0 0-3-3.87" />
+                                <path d="M16 3.13a4 4 0 0 1 0 7.75" />
+                            </svg>
+                        </div>
+                        <span>联系人管理</span>
+                    </div>
+
+                    <!-- 聊天设置 -->
+                    <div class="function-item">
+                        <div class="function-icon">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                                stroke-linecap="round" stroke-linejoin="round">
+                                <circle cx="12" cy="12" r="3" />
+                                <path
+                                    d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z" />
+                            </svg>
+                        </div>
+                        <span>聊天设置</span>
+                    </div>
+
+                    <!-- 装扮（新增） -->
+                    <div class="function-item" id="dressUpBtn">
+                        <div class="function-icon">
+                            <!-- 装扮图标（实心 + 描边，线条变粗） -->
+                            <svg viewBox="0 0 1024 1024" fill="currentColor" stroke="currentColor" stroke-width="28">
+                                <path
+                                    d="M704.887079 632.335692l299.407114-38.017872-191.751209-234.415914 56.597019-298.138214-280.918018 110.969371L323.785338 26.487258l18.144242 302.996872-219.99753 207.757764 292.095591 76.260871L542.476105 888.180662 704.887079 632.335692 704.887079 632.335692zM550.086433 780.276093l-99.011015-211.784474-225.234811-58.81657 169.629375-160.207795-13.987572-233.596246 203.891713 112.803135 216.58071-85.617983-43.618427 229.889831 147.799184 180.731224-230.823086 29.341259L550.086433 780.276093 550.086433 780.276093zM311.585409 668.536726l37.092872 37.092872-291.874731 291.874731-37.092872-37.092872 291.874731-291.874731Z" />
+                            </svg>
+                        </div>
+                        <span>装扮</span>
+                    </div>
+                    <!-- 数据管理 -->
+                    <div class="function-item">
+                        <div class="function-icon">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"
+                                stroke-linecap="round" stroke-linejoin="round">
+                                <ellipse cx="12" cy="5" rx="9" ry="3" />
+                                <path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3" />
+                                <path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5" />
+                            </svg>
+                        </div>
+                        <span>数据管理</span>
+                    </div>
+                </div>
+                <!-- 底部包裹层结束 -->
+            </div>
+            <!-- 聊天主体结束 -->
+
+            <!-- 初始创建联系人弹窗 -->
+            <div class="modal hidden" id="initModal">
+                <div class="modal-content">
+
+                    <h3>
+                        <span>欢 迎 来 到</span>
+                        <span class="star-glow-text">🌠 婷婷 の 次元专线
+                            🌙</span>
+                    </h3>
+
+                    <input type="text" id="initNameInput" placeholder="在此输入传讯对象名字" spellcheck="false">
+                    <button class="primary-btn" id="startBtn">开启次元传讯</button>
+                </div>
+            </div>
+
+
+            <!-- 头像上传弹窗 -->
+            <div class="avatar-modal hidden">
+                <div class="avatar-modal-box">
+                    <!-- 标题区域 -->
+                    <div class="avatar-modal-header">
+                        <h4 class="avatar-modal-title">上传对方的头像</h4>
+                    </div>
+
+                    <!-- 文件输入框（隐藏） -->
+                    <input type="file" id="avatar-file-input" accept="image/png,image/jpg,image/jpeg" hidden>
+
+                    <!-- 选择图片按钮 -->
+                    <button class="select-avatar-btn">选择图片文件</button>
+
+                    <!-- 预览裁剪区域 -->
+                    <div class="avatar-preview-wrap">
+                        <canvas id="avatar-canvas"></canvas>
+                    </div>
+
+                    <!-- 底部按钮组 -->
+                    <div class="avatar-btn-group">
+                        <button class="avatar-cancel-btn">取消</button>
+                        <button class="avatar-confirm-btn">确定</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 二次确认弹窗 -->
+            <div class="confirm-modal hidden" id="confirmModal">
+                <div class="confirm-box">
+                    <div class="confirm-header">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <circle cx="12" cy="12" r="10" />
+                            <line x1="12" y1="7" x2="12" y2="13" stroke-width="2.4" />
+                            <circle cx="12" cy="16.5" r="1.4" fill="#f5a623" stroke="none" />
+                        </svg>
+                        <h4 class="confirm-title" id="confirmTitle">确认操作</h4>
+                    </div>
+                    <p class="confirm-message" id="confirmMessage">确定要执行此操作吗？</p>
+                    <div class="confirm-btns">
+                        <button class="confirm-cancel" id="confirmCancelBtn">取消</button>
+                        <button class="confirm-ok confirm-ok--danger" id="confirmBtn">确定</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 表情包大图预览 -->
+            <div class="img-preview-modal hidden" id="imgPreviewModal">
+                <div class="img-preview-box">
+                    <img id="imgPreviewImg" src="" alt="表情包预览">
+                </div>
+            </div>
+
+            <!-- 聊天室改名弹窗 -->
+            <div class="confirm-modal hidden" id="groupRenameModal">
+                <div class="confirm-box">
+                    <div class="confirm-header">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                            stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" />
+                            <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" />
+                        </svg>
+                        <h4 class="confirm-title">修改聊天室名称</h4>
+                    </div>
+                    <input type="text" class="group-rename-input" id="groupRenameInput"
+                        placeholder="输入聊天室名称" maxlength="20">
+                    <div class="confirm-btns">
+                        <button class="confirm-cancel" id="groupRenameCancelBtn">取消</button>
+                        <button class="confirm-ok confirm-ok--primary" id="groupRenameConfirmBtn">确定</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 管理分组弹窗 -->
+            <div class="card-sub-modal hidden" id="manageGroupModal">
+                <div class="card-sub-box">
+
+                    <!-- 标题栏 -->
+                    <div class="card-sub-header">
+
+                        <!-- 左侧：标题 + 下拉切换 -->
+                        <div>
+                            <h4>
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                                    stroke-linecap="round" stroke-linejoin="round">
+                                    <circle cx="12" cy="12" r="3" />
+                                    <path
+                                        d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z" />
+                                </svg>
+                                管理分组
+                            </h4>
+                            <!-- 下拉切换按钮 -->
+                            <div class="card-lib-switch" id="manageGroupLibSwitch" title="切换字卡库">
+                                <span id="manageGroupLibLabel">通用</span>
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <polyline points="6 9 12 15 18 9" />
+                                </svg>
+                            </div>
+                        </div>
+
+                        <!-- 右侧：关闭按钮 -->
+                        <button class="card-sub-close" id="manageGroupCloseBtn"
+                            onclick="closeManageGroupModal()">×</button>
+
+                        <!-- ====== 下拉菜单 ====== -->
+                        <div class="card-lib-dropdown hidden" id="manageGroupLibDropdown">
+                            <div class="card-lib-dropdown-list" id="manageGroupLibDropdownList">
+                                <!-- 由 JS 动态渲染 -->
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 主体内容 -->
+                    <div class="card-sub-body">
+
+                        <!-- 列表容器（正常显示） -->
+                        <div id="manageGroupListContainer">
+                            <!-- 表头：分组名称 + 操作 -->
+                            <div class="manage-group-header">
+                                <span class="header-name">分组名称</span>
+                                <span class="header-actions">操作</span>
+                            </div>
+                            <div class="manage-group-list" id="manageGroupList">
+                                <!-- 由 JS 动态渲染 -->
+                            </div>
+                        </div>
+
+                        <!-- 底部按钮行：新增分组 + 批量管理 -->
+                        <div class="manage-group-footer">
+                            <button class="card-add-group-btn" id="cardAddGroupBtn">+ 新增分组</button>
+                            <button class="manage-batch-toggle-btn" id="manageBatchToggleBtn">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                                    stroke-linecap="round" stroke-linejoin="round">
+                                    <rect x="3" y="3" width="18" height="18" rx="2" ry="2" />
+                                    <line x1="9" y1="3" x2="9" y2="21" />
+                                    <line x1="15" y1="3" x2="15" y2="21" />
+                                    <line x1="3" y1="9" x2="21" y2="9" />
+                                    <line x1="3" y1="15" x2="21" y2="15" />
+                                </svg>
+                                批量管理
+                            </button>
+                        </div>
+
+                        <!-- 选项容器（删除时显示） -->
+                        <div id="manageGroupOptionsContainer">
+                            <!-- 由 JS 动态渲染 -->
+                        </div>
+
+                    </div>
+
+                </div>
+            </div>
+
+            <!-- 新增分组弹窗 -->
+            <div class="card-sub-modal hidden" id="addGroupModal">
+                <div class="card-sub-box">
+                    <div class="card-sub-header">
+                        <h4>新增分组</h4>
+                        <button class="card-sub-close" id="addGroupCloseBtn">×</button>
+                    </div>
+                    <div class="card-sub-body">
+                        <label>分组名称</label>
+                        <input type="text" id="addGroupInput" placeholder="请输入分组名称" maxlength="15" spellcheck="false">
+                    </div>
+                    <div class="card-sub-footer">
+                        <button class="card-sub-cancel" id="addGroupCancelBtn">取消</button>
+                        <button class="card-sub-confirm" id="addGroupConfirmBtn">新增分组</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 新增字卡弹窗 -->
+            <div class="card-sub-modal hidden" id="addCardModal">
+                <div class="card-sub-box">
+                    <div class="card-sub-header">
+                        <h4 id="addCardTitle">新增字卡</h4>
+                        <button class="card-sub-close" id="addCardCloseBtn">×</button>
+                    </div>
+                    <div class="card-sub-body">
+                        <label>所属分组</label>
+                        <select id="addCardGroupSelect"></select>
+                        <label id="addCardContentLabel">字卡内容</label>
+                        <div id="addCardContentWrap">
+                            <textarea id="addCardTextarea" placeholder="输入字卡内容，每行一条" rows="8"
+                                spellcheck="false"></textarea>
+                            <input type="file" id="addCardFileInput" accept="image/*" multiple hidden>
+                            <button class="card-upload-btn" id="addCardFileBtn">选择图片文件</button>
+                            <div class="card-file-preview" id="addCardFilePreview"></div>
+                            <textarea id="addCardEmojiInput" placeholder="输入Emoji，不用换行" rows="6"
+                                spellcheck="false"></textarea>
+                        </div>
+                    </div>
+                    <div class="card-sub-footer">
+                        <button class="card-sub-cancel" id="addCardCancelBtn">取消</button>
+                        <button class="card-sub-confirm" id="addCardConfirmBtn">确定</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 修改字卡弹窗 -->
+            <div class="card-sub-modal hidden" id="editCardModal">
+                <div class="card-sub-box">
+                    <div class="card-sub-header">
+                        <h4>修改字卡</h4>
+                        <button class="card-sub-close" id="editCardCloseBtn">×</button>
+                    </div>
+                    <div class="card-sub-body">
+                        <label>字卡内容</label>
+                        <textarea id="editCardInput" placeholder="请输入字卡内容" rows="6"
+                            spellcheck="false"></textarea>
+                    </div>
+                    <div class="card-sub-footer">
+                        <button class="card-sub-cancel" id="editCardCancelBtn">取消</button>
+                        <button class="card-sub-confirm" id="editCardConfirmBtn">确定</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 批量删除底部操作栏（表情包/Emoji 管理模式下显示） -->
+            <div class="batch-delete-bar hidden" id="batchDeleteBar">
+                <span class="batch-delete-count" id="batchDeleteCount">已选中 0 个</span>
+                <div class="batch-delete-actions">
+                    <button class="batch-select-all" id="batchSelectAll">全选</button>
+                    <button class="batch-delete-cancel" id="batchDeleteCancel">取消</button>
+                    <button class="batch-delete-confirm" id="batchDeleteConfirm">删除选中</button>
+                </div>
+            </div>
+
+            <!-- 修改分组弹窗 -->
+            <div class="card-sub-modal hidden" id="editGroupModal">
+                <div class="card-sub-box">
+                    <div class="card-sub-header">
+                        <h4>修改分组</h4>
+                        <button class="card-sub-close" id="editGroupCloseBtn">×</button>
+                    </div>
+                    <div class="card-sub-body">
+                        <label>所属分组</label>
+                        <select id="editGroupSelect"></select>
+                    </div>
+                    <div class="card-sub-footer">
+                        <button class="card-sub-cancel" id="editGroupCancelBtn">取消</button>
+                        <button class="card-sub-confirm" id="editGroupConfirmBtn">确定</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 批量操作栏（固定在页面底部，与表情包管理一致） -->
+            <div class="manage-batch-bar hidden" id="manageBatchBar">
+                <span class="batch-delete-count" id="manageBatchCount">已选中 0 个</span>
+                <div class="batch-delete-actions">
+                    <button class="batch-select-all" id="manageBatchSelectAll">全选</button>
+                    <button class="batch-delete-confirm batch-block-btn" id="manageBatchBlock">屏蔽</button>
+                    <button class="batch-delete-confirm batch-block-btn" id="manageBatchUnblock">取消屏蔽</button>
+                    <button class="batch-delete-confirm" id="manageBatchClear">清空</button>
+                    <button class="batch-delete-confirm" id="manageBatchDelete">删除</button>
+                </div>
+            </div>
+
+        </div>
+        <!-- 聊天容器结束 -->
+
+
+        <!-- ============================================================ -->
+        <!-- 以下弹窗已移回 .chat-container 内部，确保 z-index 层级正常    -->
+        <!-- ============================================================ -->
+
+        <!-- ====== 字卡库弹窗 ====== -->
+        <div class="card-modal hidden" id="cardModal">
+            <div class="card-modal-box">
+
+                <div class="card-modal-header">
+
+                    <!-- 左侧：标题 + 下拉切换 -->
+                    <div>
+                        <span class="card-modal-title">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"
+                                stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M4 4h16v16H4z" />
+                                <line x1="8" y1="8" x2="16" y2="8" />
+                                <line x1="8" y1="12" x2="16" y2="12" />
+                                <line x1="8" y1="16" x2="12" y2="16" />
+                            </svg>
+                            字卡库
+                        </span>
+                        <!-- 下拉切换按钮 -->
+                        <div class="card-lib-switch" id="cardLibSwitch" title="切换字卡库">
+                            <span id="cardLibSwitchLabel">通用</span>
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <polyline points="6 9 12 15 18 9" />
+                            </svg>
+                        </div>
+                    </div>
+
+                    <!-- 右侧：导入/导出工具 + 关闭按钮 -->
+                    <div class="card-lib-toolbar">
+                        <button class="card-lib-tool-btn" id="cardLibExportBtn" title="导出当前字卡库">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                                stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                                <polyline points="7 10 12 15 17 10" />
+                                <line x1="12" y1="15" x2="12" y2="3" />
+                            </svg>
+                            <span>导出</span>
+                        </button>
+                        <div class="card-lib-import-dropdown hidden" id="cardLibExportDropdown">
+                            <div class="card-lib-import-option" data-source="json">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                                    stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+                                    <polyline points="14 2 14 8 20 8" />
+                                    <line x1="16" y1="13" x2="8" y2="13" />
+                                    <line x1="16" y1="17" x2="8" y2="17" />
+                                </svg>
+                                <div class="card-lib-import-option-text">
+                                    <div class="card-lib-import-option-title">导出为 JSON</div>
+                                    <div class="card-lib-import-option-desc">可导出字卡、表情包、Emoji</div>
+                                </div>
+                            </div>
+                            <div class="card-lib-import-option" data-source="docx">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                                    stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+                                    <polyline points="14 2 14 8 20 8" />
+                                    <line x1="16" y1="13" x2="8" y2="13" />
+                                    <line x1="16" y1="17" x2="8" y2="17" />
+                                </svg>
+                                <div class="card-lib-import-option-text">
+                                    <div class="card-lib-import-option-title">导出为 Word</div>
+                                    <div class="card-lib-import-option-desc">仅支持导出字卡</div>
+                                </div>
+                            </div>
+                        </div>
+                        <button class="card-lib-tool-btn" id="cardLibImportBtn" title="导入字卡库">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                                stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                                <polyline points="7 10 12 5 17 10" />
+                                <line x1="12" y1="15" x2="12" y2="3" />
+                            </svg>
+                            <span>导入</span>
+                        </button>
+                        <div class="card-lib-import-dropdown hidden" id="cardLibImportDropdown">
+                            <div class="card-lib-import-option" data-source="json">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                                    stroke-linecap="round" stroke-linejoin="round">
+                                    <polyline points="4 17 10 11 4 5" />
+                                    <line x1="12" y1="19" x2="20" y2="19" />
+                                </svg>
+                                <div class="card-lib-import-option-text">
+                                    <div class="card-lib-import-option-title">从 JSON 导入</div>
+                                    <div class="card-lib-import-option-desc">字卡库备份文件（.json）</div>
+                                </div>
+                            </div>
+                            <div class="card-lib-import-option" data-source="docx">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                                    stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+                                    <polyline points="14 2 14 8 20 8" />
+                                    <line x1="16" y1="13" x2="8" y2="13" />
+                                    <line x1="16" y1="17" x2="8" y2="17" />
+                                </svg>
+                                <div class="card-lib-import-option-text">
+                                    <div class="card-lib-import-option-title">从 Word 导入</div>
+                                    <div class="card-lib-import-option-desc">.docx文档<br>字号小一 = 分组名称<br>字号小四 = 字卡内容</div>
+                                </div>
+                            </div>
+                        </div>
+                        <button class="card-modal-close-btn" id="cardModalCloseBtn" title="关闭">×</button>
+                    </div>
+
+                    <!-- ====== 下拉菜单（放在 header 内部，作为直接子元素） ====== -->
+                    <div class="card-lib-dropdown hidden" id="cardLibDropdown">
+                        <div class="card-lib-dropdown-list" id="cardLibDropdownList">
+                            <!-- 由 JS 动态渲染 -->
+                        </div>
+                    </div>
+                </div>
+
+
+                <div class="card-tabs-row">
+                    <div class="card-tabs" id="cardTabs">
+                        <button class="card-tab active" data-type="text">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                                stroke-linecap="round" stroke-linejoin="round">
+                                <rect x="3" y="3" width="18" height="18" rx="3" />
+                                <line x1="8" y1="8" x2="16" y2="8" />
+                                <line x1="12" y1="8" x2="12" y2="16" />
+                            </svg>
+                            字卡
+                        </button>
+                        <button class="card-tab" data-type="sticker">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                                stroke-linecap="round" stroke-linejoin="round">
+                                <circle cx="12" cy="12" r="10" />
+                                <path d="M8 14s1.5 2 4 2 4-2 4-2" />
+                                <line x1="9" y1="9" x2="9.01" y2="9" />
+                                <line x1="15" y1="9" x2="15.01" y2="9" />
+                            </svg>
+                            表情包
+                        </button>
+                        <button class="card-tab" data-type="emoji">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                                stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M12 2L15.5 8.5L22 12L15.5 15.5L12 22L8.5 15.5L2 12L8.5 8.5Z" />
+                            </svg>
+                            Emoji
+                        </button>
+                    </div>
+                </div>
+
+                <!-- 主体 -->
+                <div class="card-body">
+                    <!-- 左侧分组 -->
+                    <div class="card-groups-wrap">
+                        <div class="card-groups-header">
+                            分组
+                        </div>
+                        <div class="card-groups-list" id="cardGroupsList"></div>
+                    </div>
+
+                    <!-- 右侧字卡列表 -->
+                    <div class="card-list-wrap">
+                        <div class="card-list-header" id="cardListHeader">
+                            <div class="header-search-wrap">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <circle cx="11" cy="11" r="8" />
+                                    <line x1="21" y1="21" x2="16.65" y2="16.65" />
+                                </svg>
+                                <input type="text" class="header-search-input" id="cardSearchInput"
+                                    placeholder="搜索字卡..." spellcheck="false">
+                            </div>
+                        </div>
+                        <div class="card-list" id="cardList"></div>
+                        <div class="sticker-grid" id="stickerGrid"></div>
+                        <div class="sticker-grid" id="emojiGrid"></div>
+                    </div>
+                </div>
+
+                <div class="card-modal-footer">
+                    <button class="card-footer-btn" id="cardLibAddGroupBtn">+
+                        新增分组</button>
+                    <button class="card-footer-btn" id="cardManageGroupBtn">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                            stroke-linecap="round" stroke-linejoin="round">
+                            <circle cx="12" cy="12" r="3" />
+                            <path
+                                d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z" />
+                        </svg>
+                        管理分组
+                    </button>
+                    <button class="card-footer-btn" id="cardAddBtn">添加字卡</button>
+                    <button class="card-footer-btn" id="cardManageBtn">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                            stroke-linecap="round" stroke-linejoin="round">
+                            <circle cx="12" cy="12" r="3" />
+                            <path
+                                d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z" />
+                        </svg>
+                        管理
+                    </button>
+                </div>
+            </div>
+        </div>
+        <!-- 字卡库弹窗 结束 -->
+
+        <!-- ====== 新建聊天室弹窗（选人） ====== -->
+        <div class="card-sub-modal hidden" id="groupChatModal">
+            <div class="card-sub-box group-chat-box">
+
+                <!-- 标题栏 -->
+                <div class="card-sub-header">
+                    <h4>
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                            stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
+                            <circle cx="9" cy="7" r="4" />
+                            <path d="M23 21v-2a4 4 0 0 0-3-3.87" />
+                            <path d="M16 3.13a4 4 0 0 1 0 7.75" />
+                        </svg>
+                        新建聊天室
+                    </h4>
+                    <button class="card-sub-close" id="closeGroupChatModalBtn">×</button>
+                </div>
+
+                <!-- 名称输入 + 联系人多选列表 -->
+                <div class="group-chat-body">
+                    <div class="group-chat-name-row">
+                        <span class="group-chat-name-label">聊天室名称</span>
+                        <input type="text" class="group-chat-name-input" id="groupChatNameInput"
+                            placeholder="输入聊天室名称（可选）" maxlength="20">
+                    </div>
+                    <div class="group-chat-tip">选择要一起聊天的联系人（可多选）</div>
+                    <div class="group-chat-contact-list" id="groupChatContactList">
+                        <!-- 由 JS 动态渲染 -->
+                    </div>
+                    <div class="group-chat-empty hidden" id="groupChatEmpty">还没有联系人，先去创建吧</div>
+                </div>
+
+                <!-- 底部：已选数量 + 创建 -->
+                <div class="group-chat-footer">
+                    <span class="group-chat-count" id="groupChatCount">已选 0 人</span>
+                    <button class="group-chat-start-btn" id="groupChatStartBtn">创建聊天室</button>
+                </div>
+
+            </div>
+        </div>
+
+        <!-- ====== 聊天室管理弹窗 ====== -->
+        <div class="card-sub-modal hidden" id="groupManageModal">
+            <div class="card-sub-box group-chat-box">
+
+                <!-- 标题栏 -->
+                <div class="card-sub-header">
+                    <h4>
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                            stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
+                            <circle cx="9" cy="7" r="4" />
+                            <path d="M23 21v-2a4 4 0 0 0-3-3.87" />
+                            <path d="M16 3.13a4 4 0 0 1 0 7.75" />
+                        </svg>
+                        聊天室管理
+                    </h4>
+                    <button class="card-sub-close" id="closeGroupManageModalBtn">×</button>
+                </div>
+
+                <!-- 聊天室列表 -->
+                <div class="group-chat-body">
+                    <div class="group-chat-tip">选择要进入的聊天室，或新建一个聊天室</div>
+                    <div class="group-chat-room-list" id="groupChatRoomList">
+                        <!-- 由 JS 动态渲染 -->
+                    </div>
+                    <div class="group-chat-empty hidden" id="groupChatRoomEmpty">还没有聊天室，点下方按钮新建一个吧</div>
+                </div>
+
+                <!-- 底部：新建聊天室 -->
+                <div class="group-chat-footer">
+                    <button class="group-chat-start-btn" id="groupCreateNewBtn">+ 新建聊天室</button>
+                </div>
+
+            </div>
+        </div>
+
+        <!-- ====== 管理群成员弹窗 ====== -->
+        <div class="card-sub-modal hidden" id="groupMemberModal">
+            <div class="card-sub-box group-chat-box">
+
+                <!-- 标题栏 -->
+                <div class="card-sub-header">
+                    <h4>
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                            stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
+                            <circle cx="9" cy="7" r="4" />
+                            <path d="M23 21v-2a4 4 0 0 0-3-3.87" />
+                            <path d="M16 3.13a4 4 0 0 1 0 7.75" />
+                        </svg>
+                        管理群成员
+                    </h4>
+                    <button class="card-sub-close" id="closeGroupMemberModalBtn">×</button>
+                </div>
+
+                <!-- 成员管理列表 -->
+                <div class="group-chat-body">
+                    <div class="group-chat-tip">勾选联系人可加入群聊，已加入的可点击移除</div>
+                    <div class="group-chat-contact-list" id="groupMemberContactList">
+                        <!-- 由 JS 动态渲染 -->
+                    </div>
+                    <div class="group-chat-empty hidden" id="groupMemberEmpty">还没有联系人，先去创建吧</div>
+                </div>
+
+                <!-- 底部：已选数量 + 添加 -->
+                <div class="group-chat-footer">
+                    <span class="group-chat-count" id="groupMemberCount">已选 0 人</span>
+                    <button class="group-chat-start-btn" id="groupMemberAddBtn">添加(0)</button>
+                </div>
+
+            </div>
+        </div>
+
+        <!-- ====== 联系人管理弹窗 ====== -->
+        <div class="contact-manager-modal hidden" id="contactManagerModal">
+            <div class="contact-manager-box">
+                <!-- 标题栏 -->
+                <div class="contact-manager-header">
+                    <span class="contact-manager-title">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
+                            <circle cx="9" cy="7" r="4" />
+                            <path d="M23 21v-2a4 4 0 0 0-3-3.87" />
+                            <path d="M16 3.13a4 4 0 0 1 0 7.75" />
+                        </svg>
+                        联系人管理
+                    </span>
+                    <!-- 右上角关闭按钮 -->
+                    <button class="card-modal-close-btn" id="closeContactManagerBtn">×</button>
+                </div>
+
+                <!-- 联系人列表 -->
+                <div class="contact-manager-body">
+                    <div class="contact-list-wrap">
+                        <div class="contact-list" id="contactList">
+                            <!-- 由 JS 动态渲染 -->
+                        </div>
+                        <button class="contact-add-btn" id="contactAddBtn">+ 新建联系人</button>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        <!-- ====== 聊天设置弹窗 ====== -->
+        <div class="settings-modal hidden" id="settingsModal">
+            <div class="settings-modal-box">
+                <!-- 标题栏 -->
+                <div class="settings-modal-header">
+                    <span class="settings-modal-title">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                            stroke-linecap="round" stroke-linejoin="round">
+                            <circle cx="12" cy="12" r="3" />
+                            <path
+                                d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z" />
+                        </svg>
+                        聊天设置
+                    </span>
+                    <button class="settings-modal-close" id="settingsModalClose">×</button>
+                </div>
+
+                <!-- Tab 切换栏 -->
+                <div class="settings-tabs-row">
+                    <button class="settings-tab active" data-tab="single">单人</button>
+                    <button class="settings-tab" data-tab="group">群聊</button>
+                    <button class="settings-tab" data-tab="sound">音效</button>
+                </div>
+
+                <!-- 主体内容 -->
+                <div class="settings-body" id="settingsBody">
+
+                    <!-- ====== 单人选项卡 ====== -->
+                    <div class="settings-panel active" id="settingsPanelSingle">
+
+                        <!-- 模块一：回复速度 -->
+                        <div class="settings-module">
+                            <div class="settings-module-title">回复速度</div>
+                            <div class="settings-row">
+                                <label>最短回复等待</label>
+                                <div class="settings-slider-wrap">
+                                    <input type="range" id="settingMinWait" min="1" max="30" value="3" step="1">
+                                    <span class="settings-slider-value" id="settingMinWaitValue">3 秒</span>
+                                </div>
+                            </div>
+                            <div class="settings-row">
+                                <label>最长回复等待</label>
+                                <div class="settings-slider-wrap">
+                                    <input type="range" id="settingMaxWait" min="0.17" max="10" value="1"
+                                        step="0.01">
+                                    <span class="settings-slider-value" id="settingMaxWaitValue">1 分钟</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 模块二：回复条数 -->
+                        <div class="settings-module">
+                            <div class="settings-module-title">回复条数</div>
+                            <div class="settings-row">
+                                <label>最少回复条数</label>
+                                <div class="settings-slider-wrap">
+                                    <input type="range" id="settingReplyMin" min="1" max="5" value="1" step="1">
+                                    <span class="settings-slider-value" id="settingReplyMinValue">1 条</span>
+                                </div>
+                            </div>
+                            <div class="settings-row">
+                                <label>最多回复条数</label>
+                                <div class="settings-slider-wrap">
+                                    <input type="range" id="settingReplyMax" min="1" max="10" value="3" step="1">
+                                    <span class="settings-slider-value" id="settingReplyMaxValue">3 条</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 模块三：回复内容 -->
+                        <div class="settings-module">
+                            <div class="settings-module-title">回复内容</div>
+                            <!-- 拼字卡（带子选项） -->
+                            <div class="settings-row">
+                                <span class="settings-label">拼字卡</span>
+                                <div class="settings-right-wrap">
+                                    <label class="settings-toggle">
+                                        <input type="checkbox" id="settingCombineCards">
+                                        <span class="settings-toggle-slider"></span>
+                                    </label>
+                                    <span class="settings-toggle-status" id="settingCombineCardsStatus">关</span>
+                                </div>
+                            </div>
+                            <div class="settings-row settings-sub" id="settingCombineSub">
+                                <label>最短拼接条数</label>
+                                <div class="settings-slider-wrap">
+                                    <input type="range" id="settingCombineMin" min="1" max="5" value="2" step="1">
+                                    <span class="settings-slider-value" id="settingCombineMinValue">2 条</span>
+                                </div>
+                            </div>
+                            <div class="settings-row settings-sub" id="settingCombineSub2">
+                                <label>最长拼接条数</label>
+                                <div class="settings-slider-wrap">
+                                    <input type="range" id="settingCombineMax" min="2" max="10" value="4" step="1">
+                                    <span class="settings-slider-value" id="settingCombineMaxValue">4 条</span>
+                                </div>
+                            </div>
+                            <!-- 表情包混入（纯开关） -->
+                            <div class="settings-row">
+                                <span class="settings-label">表情包混入消息</span>
+                                <div class="settings-right-wrap">
+                                    <label class="settings-toggle">
+                                        <input type="checkbox" id="settingMixSticker" checked>
+                                        <span class="settings-toggle-slider"></span>
+                                    </label>
+                                    <span class="settings-toggle-status" id="settingMixStickerStatus">开</span>
+                                </div>
+                            </div>
+                            <!-- Emoji 混入（纯开关） -->
+                            <div class="settings-row">
+                                <span class="settings-label">Emoji 混入消息</span>
+                                <div class="settings-right-wrap">
+                                    <label class="settings-toggle">
+                                        <input type="checkbox" id="settingMixEmoji" checked>
+                                        <span class="settings-toggle-slider"></span>
+                                    </label>
+                                    <span class="settings-toggle-status" id="settingMixEmojiStatus">开</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 模块四：消息交互 -->
+                        <div class="settings-module">
+                            <div class="settings-module-title">消息交互</div>
+                            <!-- 回复锁（滑动条：1~60 秒） -->
+                            <div class="settings-row">
+                                <span class="settings-label">回复锁</span>
+                                <div class="settings-slider-wrap">
+                                    <input type="range" id="settingReplyLock" min="1" max="60" value="10" step="1">
+                                    <span class="settings-slider-value" id="settingReplyLockValue">10 秒</span>
+                                </div>
+                            </div>
+                            <!-- 引用回复（带子选项） -->
+                            <div class="settings-row">
+                                <span class="settings-label">引用回复</span>
+                                <div class="settings-right-wrap">
+                                    <label class="settings-toggle">
+                                        <input type="checkbox" id="settingQuoteReply" checked>
+                                        <span class="settings-toggle-slider"></span>
+                                    </label>
+                                    <span class="settings-toggle-status" id="settingQuoteReplyStatus">开</span>
+                                </div>
+                            </div>
+                            <div class="settings-row settings-sub" id="settingQuoteSub">
+                                <label>触发概率</label>
+                                <div class="settings-slider-wrap">
+                                    <input type="range" id="settingQuoteRate" min="1" max="100" value="30" step="1">
+                                    <span class="settings-slider-value" id="settingQuoteRateValue">30%</span>
+                                </div>
+                            </div>
+                            <!-- 主动发送（纯开关 + 间隔时间） -->
+                            <div class="settings-row">
+                                <span class="settings-label">主动发送</span>
+                                <div class="settings-right-wrap">
+                                    <label class="settings-toggle">
+                                        <input type="checkbox" id="settingAutoSend">
+                                        <span class="settings-toggle-slider"></span>
+                                    </label>
+                                    <span class="settings-toggle-status" id="settingAutoSendStatus">关</span>
+                                </div>
+                            </div>
+                            <div class="settings-row settings-sub" id="settingAutoSendSub">
+                                <label>间隔时间</label>
+                                <div class="settings-slider-wrap">
+                                    <input type="range" id="settingAutoSendInterval" min="1" max="120" value="30"
+                                        step="1">
+                                    <span class="settings-slider-value" id="settingAutoSendIntervalValue">30
+                                        分钟</span>
+                                </div>
+                            </div>
+                            <!-- 已读不回（纯开关） -->
+                            <div class="settings-row">
+                                <span class="settings-label">已读不回</span>
+                                <div class="settings-right-wrap">
+                                    <label class="settings-toggle">
+                                        <input type="checkbox" id="settingReadNoReply">
+                                        <span class="settings-toggle-slider"></span>
+                                    </label>
+                                    <span class="settings-toggle-status" id="settingReadNoReplyStatus">关</span>
+                                </div>
+                            </div>
+                            <!-- 显示时间戳（纯开关） -->
+                            <div class="settings-row">
+                                <span class="settings-label">显示时间戳</span>
+                                <div class="settings-right-wrap">
+                                    <label class="settings-toggle">
+                                        <input type="checkbox" id="settingShowTimestamp" checked>
+                                        <span class="settings-toggle-slider"></span>
+                                    </label>
+                                    <span class="settings-toggle-status" id="settingShowTimestampStatus">开</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- ====== 群聊选项卡 ====== -->
+                    <div class="settings-panel" id="settingsPanelGroup">
+
+                        <!-- 模块一：回复速度 -->
+                        <div class="settings-module">
+                            <div class="settings-module-title">回复速度</div>
+                            <div class="settings-row">
+                                <label>最短回复等待</label>
+                                <div class="settings-slider-wrap">
+                                    <input type="range" id="settingGroupMinWait" min="1" max="30" value="3" step="1">
+                                    <span class="settings-slider-value" id="settingGroupMinWaitValue">3 秒</span>
+                                </div>
+                            </div>
+                            <div class="settings-row">
+                                <label>最长回复等待</label>
+                                <div class="settings-slider-wrap">
+                                    <input type="range" id="settingGroupMaxWait" min="0.17" max="10" value="1"
+                                        step="0.01">
+                                    <span class="settings-slider-value" id="settingGroupMaxWaitValue">1 分钟</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 模块二：回复条数 -->
+                        <div class="settings-module">
+                            <div class="settings-module-title">回复条数</div>
+                            <div class="settings-row">
+                                <label>最少回复条数</label>
+                                <div class="settings-slider-wrap">
+                                    <input type="range" id="settingGroupReplyMin" min="1" max="5" value="1" step="1">
+                                    <span class="settings-slider-value" id="settingGroupReplyMinValue">1 条</span>
+                                </div>
+                            </div>
+                            <div class="settings-row">
+                                <label>最多回复条数</label>
+                                <div class="settings-slider-wrap">
+                                    <input type="range" id="settingGroupReplyMax" min="1" max="10" value="3" step="1">
+                                    <span class="settings-slider-value" id="settingGroupReplyMaxValue">3 条</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 模块三：回复内容 -->
+                        <div class="settings-module">
+                            <div class="settings-module-title">回复内容</div>
+                            <!-- 拼字卡（带子选项） -->
+                            <div class="settings-row">
+                                <span class="settings-label">拼字卡</span>
+                                <div class="settings-right-wrap">
+                                    <label class="settings-toggle">
+                                        <input type="checkbox" id="settingGroupCombineCards">
+                                        <span class="settings-toggle-slider"></span>
+                                    </label>
+                                    <span class="settings-toggle-status" id="settingGroupCombineCardsStatus">关</span>
+                                </div>
+                            </div>
+                            <div class="settings-row settings-sub" id="settingGroupCombineSub">
+                                <label>最短拼接条数</label>
+                                <div class="settings-slider-wrap">
+                                    <input type="range" id="settingGroupCombineMin" min="1" max="5" value="2" step="1">
+                                    <span class="settings-slider-value" id="settingGroupCombineMinValue">2 条</span>
+                                </div>
+                            </div>
+                            <div class="settings-row settings-sub" id="settingGroupCombineSub2">
+                                <label>最长拼接条数</label>
+                                <div class="settings-slider-wrap">
+                                    <input type="range" id="settingGroupCombineMax" min="2" max="10" value="4" step="1">
+                                    <span class="settings-slider-value" id="settingGroupCombineMaxValue">4 条</span>
+                                </div>
+                            </div>
+                            <!-- 表情包混入（纯开关） -->
+                            <div class="settings-row">
+                                <span class="settings-label">表情包混入消息</span>
+                                <div class="settings-right-wrap">
+                                    <label class="settings-toggle">
+                                        <input type="checkbox" id="settingGroupMixSticker" checked>
+                                        <span class="settings-toggle-slider"></span>
+                                    </label>
+                                    <span class="settings-toggle-status" id="settingGroupMixStickerStatus">开</span>
+                                </div>
+                            </div>
+                            <!-- Emoji 混入（纯开关） -->
+                            <div class="settings-row">
+                                <span class="settings-label">Emoji 混入消息</span>
+                                <div class="settings-right-wrap">
+                                    <label class="settings-toggle">
+                                        <input type="checkbox" id="settingGroupMixEmoji" checked>
+                                        <span class="settings-toggle-slider"></span>
+                                    </label>
+                                    <span class="settings-toggle-status" id="settingGroupMixEmojiStatus">开</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 模块四：消息交互 -->
+                        <div class="settings-module">
+                            <div class="settings-module-title">消息交互</div>
+                            <!-- 回复锁（滑动条：1~60 秒） -->
+                            <div class="settings-row">
+                                <span class="settings-label">回复锁</span>
+                                <div class="settings-slider-wrap">
+                                    <input type="range" id="settingGroupReplyLock" min="1" max="60" value="10" step="1">
+                                    <span class="settings-slider-value" id="settingGroupReplyLockValue">10 秒</span>
+                                </div>
+                            </div>
+                            <!-- 引用回复（带子选项） -->
+                            <div class="settings-row">
+                                <span class="settings-label">引用回复</span>
+                                <div class="settings-right-wrap">
+                                    <label class="settings-toggle">
+                                        <input type="checkbox" id="settingGroupQuoteReply" checked>
+                                        <span class="settings-toggle-slider"></span>
+                                    </label>
+                                    <span class="settings-toggle-status" id="settingGroupQuoteReplyStatus">开</span>
+                                </div>
+                            </div>
+                            <div class="settings-row settings-sub" id="settingGroupQuoteSub">
+                                <label>触发概率</label>
+                                <div class="settings-slider-wrap">
+                                    <input type="range" id="settingGroupQuoteRate" min="1" max="100" value="30" step="1">
+                                    <span class="settings-slider-value" id="settingGroupQuoteRateValue">30%</span>
+                                </div>
+                            </div>
+                            <!-- 主动发送（纯开关 + 间隔时间） -->
+                            <div class="settings-row">
+                                <span class="settings-label">主动发送</span>
+                                <div class="settings-right-wrap">
+                                    <label class="settings-toggle">
+                                        <input type="checkbox" id="settingGroupAutoSend">
+                                        <span class="settings-toggle-slider"></span>
+                                    </label>
+                                    <span class="settings-toggle-status" id="settingGroupAutoSendStatus">关</span>
+                                </div>
+                            </div>
+                            <div class="settings-row settings-sub" id="settingGroupAutoSendSub">
+                                <label>间隔时间</label>
+                                <div class="settings-slider-wrap">
+                                    <input type="range" id="settingGroupAutoSendInterval" min="1" max="120" value="30"
+                                        step="1">
+                                    <span class="settings-slider-value" id="settingGroupAutoSendIntervalValue">30
+                                        分钟</span>
+                                </div>
+                            </div>
+                            <!-- 已读不回（纯开关） -->
+                            <div class="settings-row">
+                                <span class="settings-label">已读不回</span>
+                                <div class="settings-right-wrap">
+                                    <label class="settings-toggle">
+                                        <input type="checkbox" id="settingGroupReadNoReply">
+                                        <span class="settings-toggle-slider"></span>
+                                    </label>
+                                    <span class="settings-toggle-status" id="settingGroupReadNoReplyStatus">关</span>
+                                </div>
+                            </div>
+                            <!-- 显示时间戳（纯开关） -->
+                            <div class="settings-row">
+                                <span class="settings-label">显示时间戳</span>
+                                <div class="settings-right-wrap">
+                                    <label class="settings-toggle">
+                                        <input type="checkbox" id="settingGroupShowTimestamp" checked>
+                                        <span class="settings-toggle-slider"></span>
+                                    </label>
+                                    <span class="settings-toggle-status" id="settingGroupShowTimestampStatus">开</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- ====== 音效选项卡 ====== -->
+                    <div class="settings-panel" id="settingsPanelSound">
+                        <div class="settings-module">
+                            <div class="settings-module-title">音效设置</div>
+                            <!-- 音效总开关（纯开关） -->
+                            <div class="settings-row">
+                                <span class="settings-label">音效总开关</span>
+                                <div class="settings-right-wrap">
+                                    <label class="settings-toggle">
+                                        <input type="checkbox" id="settingSoundEnabled" checked>
+                                        <span class="settings-toggle-slider"></span>
+                                    </label>
+                                    <span class="settings-toggle-status" id="settingSoundEnabledStatus">开</span>
+                                </div>
+                            </div>
+                            <!-- 子选项容器（音量、发送音效、接收音效） -->
+                            <div id="soundSubOptions">
+                                <!-- 音量（滑块） -->
+                                <div class="settings-row">
+                                    <label>音量</label>
+                                    <div class="settings-slider-wrap">
+                                        <input type="range" id="settingSoundVolume" min="0" max="100" value="70"
+                                            step="1">
+                                        <span class="settings-slider-value" id="settingSoundVolumeValue">70%</span>
+                                    </div>
+                                </div>
+
+                                <!-- 发送音效（下拉选择） -->
+                                <div class="settings-row">
+                                    <label>发送消息音效</label>
+                                    <select id="settingSendSound">
+                                        <option value="crisp">清脆</option>
+                                        <option value="warm">温暖</option>
+                                        <option value="cute">可爱</option>
+                                        <option value="soft">轻柔</option>
+                                        <option value="ethereal">飘渺</option>
+                                    </select>
+                                    <button class="settings-sound-preview" data-sound="send">试听</button>
+                                </div>
+
+                                <!-- 接收音效（下拉选择） -->
+                                <div class="settings-row">
+                                    <label>接收消息音效</label>
+                                    <select id="settingReceiveSound">
+                                        <option value="crisp">清脆</option>
+                                        <option value="warm">温暖</option>
+                                        <option value="cute">可爱</option>
+                                        <option value="soft">轻柔</option>
+                                        <option value="ethereal">飘渺</option>
+                                    </select>
+                                    <button class="settings-sound-preview" data-sound="receive">试听</button>
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 底部按钮 -->
+                <div class="settings-footer">
+                    <button class="settings-confirm-btn" id="settingsConfirmBtn">保存设置</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- ====== 数据管理弹窗 ====== -->
+        <div class="settings-modal hidden" id="dataManagerModal">
+            <div class="settings-modal-box data-manager-box">
+
+                <!-- 标题栏 -->
+                <div class="settings-modal-header">
+                    <span class="settings-modal-title">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                            stroke-linecap="round" stroke-linejoin="round">
+                            <ellipse cx="12" cy="5" rx="9" ry="3" />
+                            <path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3" />
+                            <path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5" />
+                        </svg>
+                        数据管理
+                    </span>
+                    <button class="settings-modal-close" id="dataManagerCloseBtn">×</button>
+                </div>
+
+                <!-- 主体 -->
+                <div class="settings-body" id="dataManagerBody">
+
+                    <!-- 模块一：存储空间（独占一行） -->
+                    <div class="settings-module data-storage-module">
+                        <div class="settings-module-title">存储空间</div>
+                        <div class="storage-progress-row">
+                            <span class="storage-usage-text" id="storageUsageText">已用 0MB / 5MB</span>
+                            <div class="storage-progress-track">
+                                <div class="storage-progress-bar" id="storageProgressBar"></div>
+                            </div>
+                            <span class="storage-percent" id="storagePercent">0%</span>
+                        </div>
+                        <div class="storage-detail-row" id="storageDetailRow">
+                            <span class="storage-detail-item" id="storageContacts">·联系人 0MB</span>
+                            <span class="storage-detail-item" id="storageCards">·字卡库 0MB</span>
+                            <span class="storage-detail-item" id="storageMessages">·聊天记录 0MB</span>
+                            <span class="storage-detail-item" id="storageSettings">·全局设置 0MB</span>
+                        </div>
+                    </div>
+
+                    <!-- 模块二：2×2 卡片网格 -->
+                    <div class="data-card-grid">
+
+                        <!-- 卡片1：全量备份/恢复 -->
+                        <div class="data-card">
+                            <div class="data-card-title">全量备份/恢复</div>
+                            <div class="data-card-divider"></div>
+                            <div class="data-card-body">
+                                <div class="data-card-desc">当前所有数据</div>
+
+                                <div class="data-card-list">
+                                    <div class="data-card-list-item" id="fullBackupContacts">·联系人 0 个</div>
+                                    <div class="data-card-list-item" id="fullBackupGroups">·群聊 0 个</div>
+                                    <div class="data-card-list-item" id="fullBackupCards">·字卡 0 张</div>
+                                    <div class="data-card-list-item" id="fullBackupMessages">·聊天记录 0 条</div>
+                                    <div class="data-card-list-item">·全局设置</div>
+                                </div>
+
+                            </div>
+                            <div class="data-card-actions">
+                                <button class="data-card-btn secondary" id="fullRestoreBtn">导入 ZIP</button>
+                                <button class="data-card-btn primary" id="fullBackupBtn">导出 ZIP</button>
+                            </div>
+                        </div>
+
+                        <!-- 卡片2：联系人/聊天室备份 -->
+                        <div class="data-card">
+                            <div class="data-card-title">联系人/聊天室备份</div>
+                            <div class="data-card-divider"></div>
+                            <div class="data-card-body">
+
+                                <select class="data-card-select" id="contactBackupSelect">
+                                    <option value="">请选择联系人或聊天室</option>
+                                </select>
+
+                                <div class="data-card-desc">导出该联系人或聊天室的</div>
+
+                                <div class="data-card-list">
+                                    <div class="data-card-list-item" id="contactBackupInfo">·联系人信息</div>
+                                    <div class="data-card-list-item" id="contactBackupCards">·字卡库 0 张</div>
+                                    <div class="data-card-list-item" id="contactBackupMessages">·聊天记录 0 条</div>
+                                </div>
+
+                            </div>
+                            <div class="data-card-actions">
+                                <button class="data-card-btn secondary" id="contactImportBtn">导入</button>
+                                <button class="data-card-btn primary" id="contactExportBtn">导出</button>
+                            </div>
+                        </div>
+
+                        <!-- 卡片3：删除聊天记录 -->
+                        <div class="data-card">
+                            <div class="data-card-title">删除聊天记录</div>
+                            <div class="data-card-divider"></div>
+                            <div class="data-card-body">
+                                <select class="data-card-select" id="deleteChatSelect">
+                                    <option value="">请选择联系人或聊天室</option>
+                                </select>
+                                <div class="data-card-desc">删除该联系人/聊天室的所有聊天记录</div>
+                            </div>
+                            <div class="data-card-actions">
+                                <button class="data-card-btn danger" id="deleteChatBtn">删除</button>
+                            </div>
+                        </div>
+
+                        <!-- 卡片4：重置数据 -->
+                        <div class="data-card">
+                            <div class="data-card-title">重置数据</div>
+                            <div class="data-card-divider"></div>
+                            <div class="data-card-body">
+                                <div class="data-card-desc">清空所有数据</div>
+                                <div class="data-card-desc">含聊天设置与装扮设置</div>
+                                <div class="data-card-desc">此操作不可恢复！</div>
+                            </div>
+                            <div class="data-card-actions">
+                                <button class="data-card-btn danger" id="resetDataBtn">重置所有数据</button>
+                            </div>
+                        </div>
+
+                        <!-- 卡片5：清空字卡库（跨整行） -->
+                        <div class="data-card clear-lib-card">
+                            <div class="data-card-title">清空字卡库</div>
+                            <div class="data-card-divider"></div>
+                            <div class="data-card-body">
+                                <select class="data-card-select" id="clearLibSelect"></select>
+
+                                <div class="clear-scope-group" id="clearScopeGroup">
+                                    <label class="clear-scope-option">
+                                        <input type="radio" name="clearScope" value="all" checked>
+                                        <span>全部（字卡 + 表情包 + Emoji）</span>
+                                    </label>
+                                    <label class="clear-scope-option">
+                                        <input type="radio" name="clearScope" value="text">
+                                        <span>仅字卡</span>
+                                    </label>
+                                    <label class="clear-scope-option">
+                                        <input type="radio" name="clearScope" value="sticker">
+                                        <span>仅表情包</span>
+                                    </label>
+                                    <label class="clear-scope-option">
+                                        <input type="radio" name="clearScope" value="emoji">
+                                        <span>仅Emoji</span>
+                                    </label>
+                                </div>
+                            </div>
+                            <div class="data-card-actions">
+                                <button class="data-card-btn danger" id="clearCardLibBtn">清空字卡库</button>
+                                <button class="data-card-btn secondary" id="clearSelectedBtn">清空选中的内容</button>
+                            </div>
+                        </div>
+
+                    </div>
+
+                </div>
+
+                <!-- 底部 -->
+                <div class="settings-footer">
+                    <button class="settings-cancel-btn" id="dataManagerCloseFooterBtn">关闭</button>
+                </div>
+
+            </div>
+        </div>
+
+        <!-- ====== 装扮弹窗 ====== -->
+        <div class="settings-modal hidden" id="dressUpModal">
+            <div class="settings-modal-box dress-up-box">
+
+                <!-- 标题栏 -->
+                <div class="settings-modal-header">
+                    <span class="settings-modal-title">
+                        <svg viewBox="0 0 1024 1024" fill="currentColor" stroke="currentColor" stroke-width="28">
+                            <path d="M704.887079 632.335692l299.407114-38.017872-191.751209-234.415914 56.597019-298.138214-280.918018 110.969371L323.785338 26.487258l18.144242 302.996872-219.99753 207.757764 292.095591 76.260871L542.476105 888.180662 704.887079 632.335692 704.887079 632.335692zM550.086433 780.276093l-99.011015-211.784474-225.234811-58.81657 169.629375-160.207795-13.987572-233.596246 203.891713 112.803135 216.58071-85.617983-43.618427 229.889831 147.799184 180.731224-230.823086 29.341259L550.086433 780.276093 550.086433 780.276093zM311.585409 668.536726l37.092872 37.092872-291.874731 291.874731-37.092872-37.092872 291.874731-291.874731Z" />
+                        </svg>
+                        装扮
+                    </span>
+                    <button class="settings-modal-close" id="dressUpCloseBtn">×</button>
+                </div>
+
+                <!-- Tab 切换栏 -->
+                <div class="settings-tabs-row">
+                    <button class="settings-tab active" data-tab="global">全局</button>
+                    <button class="settings-tab" data-tab="single">单人</button>
+                    <button class="settings-tab" data-tab="group">群聊</button>
+                </div>
+
+                <!-- 主体 -->
+                <div class="settings-body dress-up-body">
+
+                    <!-- ====== 全局选项卡 ====== -->
+                    <div class="settings-panel active" id="dressUpPanelGlobal">
+
+                        <!-- 模块一：主题色 -->
+                        <div class="dressup-accordion closed" data-acc="themeColor">
+                            <div class="accordion-head">
+                                <span class="accordion-title">主题色（全站变色）</span>
+                                <span class="accordion-arrow">▸</span>
+                            </div>
+                            <div class="accordion-body">
+                            <!-- 第一行：内置 -->
+                            <div class="cp-group-label"><span>内置</span><span class="cp-group-line"></span></div>
+                            <div class="color-picker-grid" id="colorPickerGrid">
+                                <!-- 由 JS 动态渲染 -->
+                            </div>
+                            <!-- 第二行：自选 -->
+                            <div class="cp-group-label"><span>自选</span><span class="cp-group-line"></span></div>
+                            <div class="custom-color-grid" id="customColorGrid">
+                                <!-- 由 JS 动态渲染 -->
+                            </div>
+                            <!-- 第三行：自定义色盘（长方形） -->
+                            <div class="cp-group-label"><span>自定义色盘</span><span class="cp-group-line"></span></div>
+                            <button type="button" class="custom-color-pad" id="customThemeColorPicker" title="点击打开取色面板">
+                                <span class="custom-pad-preview"></span>
+                                <span class="custom-pad-text">自定义主题色<small>点击打开取色面板</small></span>
+                                <span class="custom-pad-icon">🎨</span>
+                            </button>
+                            </div>
+                        </div>
+
+                        <!-- 模块二：高级调节 -->
+                        <div class="dressup-accordion closed" data-acc="advanced">
+                            <div class="accordion-head">
+                                <span class="accordion-title">高级调节</span>
+                                <span class="accordion-arrow">▸</span>
+                            </div>
+                            <div class="accordion-body glass-module">
+
+                            <!-- 标题栏 -->
+                            <div class="glass-row">
+                                <span class="glass-label">标题栏</span>
+                                <div class="glass-controls">
+                                    <div class="glass-slider-wrap">
+                                        <span class="glass-slider-label">透明度</span>
+                                        <input type="range" id="glassHeaderOpacity" min="0" max="100" value="25" step="1">
+                                        <span class="glass-slider-value" id="glassHeaderOpacityValue">25%</span>
+                                    </div>
+                                    <div class="glass-slider-wrap">
+                                        <span class="glass-slider-label">毛玻璃</span>
+                                        <input type="range" id="glassHeaderBlur" min="0" max="32" value="10" step="1">
+                                        <span class="glass-slider-value" id="glassHeaderBlurValue">10px</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- 消息区域 -->
+                            <div class="glass-row">
+                                <span class="glass-label">消息区域</span>
+                                <div class="glass-controls">
+                                    <div class="glass-slider-wrap">
+                                        <span class="glass-slider-label">透明度</span>
+                                        <input type="range" id="glassMessageOpacity" min="0" max="100" value="0" step="1">
+                                        <span class="glass-slider-value" id="glassMessageOpacityValue">0%</span>
+                                    </div>
+                                    <div class="glass-slider-wrap">
+                                        <span class="glass-slider-label">毛玻璃</span>
+                                        <input type="range" id="glassMessageBlur" min="0" max="32" value="0" step="1">
+                                        <span class="glass-slider-value" id="glassMessageBlurValue">0px</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- 输入框区域 -->
+                            <div class="glass-row">
+                                <span class="glass-label">输入框区域</span>
+                                <div class="glass-controls">
+                                    <div class="glass-slider-wrap">
+                                        <span class="glass-slider-label">透明度</span>
+                                        <input type="range" id="glassBottomOpacity" min="0" max="100" value="60" step="1">
+                                        <span class="glass-slider-value" id="glassBottomOpacityValue">60%</span>
+                                    </div>
+                                    <div class="glass-slider-wrap">
+                                        <span class="glass-slider-label">毛玻璃</span>
+                                        <input type="range" id="glassBottomBlur" min="0" max="32" value="10" step="1">
+                                        <span class="glass-slider-value" id="glassBottomBlurValue">10px</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- 恢复高级调节默认 -->
+                            <button class="glass-reset-btn" id="glassResetBtn">恢复高级调节默认</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- ====== 单人选选项卡 ====== -->
+                    <div class="settings-panel" id="dressUpPanelSingle">
+
+                        <!-- 生效对象下拉框 -->
+                        <div class="dress-target-row">
+                            <span class="dress-target-label">生效对象</span>
+                            <div class="dress-target-wrap">
+                                <button type="button" class="dress-target-btn" id="singleTargetBtn">
+                                    <span class="dress-target-name" id="singleTargetName">通用</span>
+                                    <span class="dress-target-arrow">▾</span>
+                                </button>
+                                <div class="dress-target-dropdown hidden" id="singleTargetDropdown">
+                                    <div class="dress-target-list" id="singleTargetList"></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="dress-target-warn hidden" id="singleTargetWarn">⚠️ 通用设置会改变所有联系人，谨慎选择</div>
+
+                        <!-- 模块：聊天背景 -->
+                        <div class="dressup-accordion closed" data-acc="bgSingle">
+                            <div class="accordion-head">
+                                <span class="accordion-title">聊天背景</span>
+                                <span class="accordion-arrow">▸</span>
+                            </div>
+                            <div class="accordion-body">
+
+                            <!-- 上传区域 -->
+                            <div class="bg-upload-row">
+                                <button class="bg-upload-btn" id="bgUploadBtn">📁 选择图片</button>
+                                <button class="bg-remove-btn" id="bgRemoveBtn">移除图片</button>
+                            </div>
+                            <input type="file" id="bgFileInput" accept="image/*" hidden>
+
+                            <!-- 最近上传 -->
+                            <div class="recent-bg-row hidden" id="recentBgRow">
+                                <div class="recent-bg-title">最近上传（最多 5 张）</div>
+                                <div class="recent-bg-grid" id="recentBgGrid"></div>
+                            </div>
+
+                            <!-- 生效范围切换 -->
+                            <div class="bg-scope-row">
+                                <span class="bg-scope-label">生效范围</span>
+                                <div class="bg-scope-options">
+                                    <label class="bg-scope-option">
+                                        <input type="radio" name="bgScope" value="chat" checked>
+                                        <span>仅聊天区域</span>
+                                    </label>
+                                    <label class="bg-scope-option">
+                                        <input type="radio" name="bgScope" value="full">
+                                        <span>全站</span>
+                                    </label>
+                                </div>
+                            </div>
+                            </div>
+                        </div>
+
+                        <!-- 模块：时间戳颜色 -->
+                        <div class="dressup-accordion closed" data-acc="tsSingle">
+                            <div class="accordion-head">
+                                <span class="accordion-title">时间戳颜色</span>
+                                <span class="accordion-arrow">▸</span>
+                            </div>
+                            <div class="accordion-body">
+                            <!-- 第一行：内置 -->
+                            <div class="cp-group-label"><span>内置</span><span class="cp-group-line"></span></div>
+                            <div class="color-picker-grid" id="timestampColorGrid">
+                                <!-- 由 JS 动态渲染 -->
+                            </div>
+                            <!-- 第二行：自选 -->
+                            <div class="cp-group-label"><span>自选</span><span class="cp-group-line"></span></div>
+                            <div class="custom-color-grid" id="timestampCustomColorGrid">
+                                <!-- 由 JS 动态渲染 -->
+                            </div>
+                            <!-- 第三行：自定义色盘（长方形） -->
+                            <div class="cp-group-label"><span>自定义色盘</span><span class="cp-group-line"></span></div>
+                            <button type="button" class="custom-color-pad" id="customTimestampColorPicker" title="点击打开取色面板">
+                                <span class="custom-pad-preview"></span>
+                                <span class="custom-pad-text">自定义时间戳颜色<small>点击打开取色面板</small></span>
+                                <span class="custom-pad-icon">🎨</span>
+                            </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- ====== 群聊选项卡 ====== -->
+                    <div class="settings-panel" id="dressUpPanelGroup">
+
+                        <!-- 生效对象下拉框 -->
+                        <div class="dress-target-row">
+                            <span class="dress-target-label">生效对象</span>
+                            <div class="dress-target-wrap">
+                                <button type="button" class="dress-target-btn" id="groupTargetBtn">
+                                    <span class="dress-target-name" id="groupTargetName">通用</span>
+                                    <span class="dress-target-arrow">▾</span>
+                                </button>
+                                <div class="dress-target-dropdown hidden" id="groupTargetDropdown">
+                                    <div class="dress-target-list" id="groupTargetList"></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="dress-target-warn hidden" id="groupTargetWarn">⚠️ 通用设置会改变所有聊天室，谨慎选择</div>
+
+                        <!-- 模块：聊天背景 -->
+                        <div class="dressup-accordion closed" data-acc="bgGroup">
+                            <div class="accordion-head">
+                                <span class="accordion-title">聊天背景</span>
+                                <span class="accordion-arrow">▸</span>
+                            </div>
+                            <div class="accordion-body">
+
+                            <!-- 上传区域 -->
+                            <div class="bg-upload-row">
+                                <button class="bg-upload-btn" id="groupBgUploadBtn">📁 选择图片</button>
+                                <button class="bg-remove-btn" id="groupBgRemoveBtn">移除图片</button>
+                            </div>
+                            <input type="file" id="groupBgFileInput" accept="image/*" hidden>
+
+                            <!-- 最近上传 -->
+                            <div class="recent-bg-row hidden" id="groupRecentBgRow">
+                                <div class="recent-bg-title">最近上传（最多 5 张）</div>
+                                <div class="recent-bg-grid" id="groupRecentBgGrid"></div>
+                            </div>
+
+                            <!-- 生效范围切换 -->
+                            <div class="bg-scope-row">
+                                <span class="bg-scope-label">生效范围</span>
+                                <div class="bg-scope-options">
+                                    <label class="bg-scope-option">
+                                        <input type="radio" name="groupBgScope" value="chat" checked>
+                                        <span>仅聊天区域</span>
+                                    </label>
+                                    <label class="bg-scope-option">
+                                        <input type="radio" name="groupBgScope" value="full">
+                                        <span>全站</span>
+                                    </label>
+                                </div>
+                            </div>
+                            </div>
+                        </div>
+
+                        <!-- 模块：时间戳颜色 -->
+                        <div class="dressup-accordion closed" data-acc="tsGroup">
+                            <div class="accordion-head">
+                                <span class="accordion-title">时间戳颜色</span>
+                                <span class="accordion-arrow">▸</span>
+                            </div>
+                            <div class="accordion-body">
+                            <!-- 第一行：内置 -->
+                            <div class="cp-group-label"><span>内置</span><span class="cp-group-line"></span></div>
+                            <div class="color-picker-grid" id="groupTimestampColorGrid">
+                                <!-- 由 JS 动态渲染 -->
+                            </div>
+                            <!-- 第二行：自选 -->
+                            <div class="cp-group-label"><span>自选</span><span class="cp-group-line"></span></div>
+                            <div class="custom-color-grid" id="groupTimestampCustomColorGrid">
+                                <!-- 由 JS 动态渲染 -->
+                            </div>
+                            <!-- 第三行：自定义色盘（长方形） -->
+                            <div class="cp-group-label"><span>自定义色盘</span><span class="cp-group-line"></span></div>
+                            <button type="button" class="custom-color-pad" id="customGroupTimestampColorPicker" title="点击打开取色面板">
+                                <span class="custom-pad-preview"></span>
+                                <span class="custom-pad-text">自定义时间戳颜色<small>点击打开取色面板</small></span>
+                                <span class="custom-pad-icon">🎨</span>
+                            </button>
+                            </div>
+                        </div>
+
+                        <!-- 模块：多人聊天名称颜色 -->
+                        <div class="dressup-accordion closed" data-acc="nameColorGroup">
+                            <div class="accordion-head">
+                                <span class="accordion-title">多人聊天名称颜色</span>
+                                <span class="accordion-arrow">▸</span>
+                            </div>
+                            <div class="accordion-body">
+                            <!-- 第一行：内置 -->
+                            <div class="cp-group-label"><span>内置</span><span class="cp-group-line"></span></div>
+                            <div class="color-picker-grid" id="groupNameColorGrid">
+                                <!-- 由 JS 动态渲染 -->
+                            </div>
+                            <!-- 第二行：自选 -->
+                            <div class="cp-group-label"><span>自选</span><span class="cp-group-line"></span></div>
+                            <div class="custom-color-grid" id="groupNameCustomColorGrid">
+                                <!-- 由 JS 动态渲染 -->
+                            </div>
+                            <!-- 第三行：自定义色盘（长方形） -->
+                            <div class="cp-group-label"><span>自定义色盘</span><span class="cp-group-line"></span></div>
+                            <button type="button" class="custom-color-pad" id="customGroupNameColorPicker" title="点击打开取色面板">
+                                <span class="custom-pad-preview"></span>
+                                <span class="custom-pad-text">自定义多人聊天名称颜色<small>点击打开取色面板</small></span>
+                                <span class="custom-pad-icon">🎨</span>
+                            </button>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+
+                <!-- 底部 -->
+                <div class="settings-footer dress-up-footer">
+                    <button class="settings-cancel-btn" id="dressUpResetBtn">恢复全站默认</button>
+                    <button class="settings-confirm-btn" id="dressUpConfirmBtn">关闭</button>
+                </div>
+
+            </div>
+        </div>
+
+        <!-- ====== 自定义取色面板（方案A：色相条 + 饱和度/明度方块 + 透明度条） ====== -->
+        <div class="color-wheel-panel hidden" id="colorWheelPanel">
+            <div class="color-wheel-box">
+                <div class="color-wheel-title">选择颜色</div>
+                <div class="sv-area" id="colorSvWrap">
+                    <canvas id="colorSvCanvas" width="220" height="150"></canvas>
+                    <div class="sv-indicator" id="colorSvIndicator"></div>
+                </div>
+                <div class="cp-row">
+                    <span class="cp-label">色相</span>
+                    <div class="cp-bar" id="colorHueWrap">
+                        <canvas id="colorHueCanvas" width="220" height="16"></canvas>
+                        <div class="cp-bar-indicator" id="colorHueIndicator"></div>
+                    </div>
+                </div>
+                <div class="cp-row">
+                    <span class="cp-label">透明度</span>
+                    <div class="cp-bar" id="colorAlphaWrap">
+                        <canvas id="colorAlphaCanvas" width="220" height="16"></canvas>
+                        <div class="cp-bar-indicator" id="colorAlphaIndicator"></div>
+                    </div>
+                </div>
+                <div class="color-wheel-preview-row">
+                    <div class="color-wheel-current" id="colorWheelCurrent"></div>
+                    <input type="text" class="color-wheel-hex" id="colorWheelHex" value="#FFFFFF" placeholder="#rrggbb" spellcheck="false" autocomplete="off" maxlength="9" title="可直接输入颜色编码，如 #ff8800 或 #ff880080（回车/失焦生效）">
+                    <span class="color-wheel-hsla" id="colorWheelHsla"></span>
+                </div>
+                <div class="color-wheel-actions">
+                    <button type="button" class="color-wheel-btn eyedropper" id="colorWheelEyeBtn" title="从屏幕任意位置取色">
+                        <svg class="eye-icon" viewBox="0 0 1024 1024" xmlns="http://www.w3.org/2000/svg"><path d="M652.214857 535.076571l-39.131428 39.131429a866.742857 866.742857 0 0 0-51.419429 46.957714l-221.769143 221.769143c-20.882286 20.845714-54.966857 22.820571-86.564571 7.936l-9.581715 9.216c-16.384 16.018286-46.628571 23.442286-70.326857-0.219428-23.661714-23.698286-14.848-55.332571-1.353143-71.497143l9.508572-9.508572c-14.628571-31.451429-12.617143-65.316571 8.155428-86.052571l221.805715-221.805714a866.742857 866.742857 0 0 1 51.419428-46.921143l39.131429-39.131429 150.125714 150.125714z m-84.772571-6.509714l-58.843429-58.843428L256 713.910857a45.348571 45.348571 0 0 0-2.230857 62.902857 41.691429 41.691429 0 0 0 60.269714 1.828572l253.44-250.075429z m278.272-343.515428c43.227429 43.227429 48.64 107.922286 12.068571 144.493714l-93.696 93.696 9.764572 9.801143c27.026286 26.989714 31.414857 66.413714 9.801142 88.064-21.613714 21.577143-61.074286 17.188571-88.064-9.801143l-176.128-176.128c-27.062857-27.026286-31.414857-66.450286-9.801142-88.064s61.074286-17.225143 88.064 9.801143l9.801142 9.764571 93.659429-93.659428c36.571429-36.571429 101.302857-31.195429 144.530286 12.032z" fill="currentColor"></path></svg>
+                        <span>取色</span>
+                    </button>
+                    <button type="button" class="color-wheel-btn cancel" id="colorWheelCancelBtn">取消</button>
+                    <button type="button" class="color-wheel-btn confirm" id="colorWheelConfirmBtn">确定</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- ====== 脚本加载 ====== -->
+        <script src="js/data.js"></script>
+        <script src="js/contact.js"></script>
+        <script src="js/message.js"></script>
+        <script src="js/group-chat.js"></script>
+        <script src="js/avatar.js"></script>
+        <script src="js/main-ui.js"></script>
+        <script src="js/contact-ui.js"></script>
+        <script src="js/card.js"></script>
+        <script src="js/chat-settings.js"></script>
+        <script src="js/data-manager.js"></script>
+        <script src="js/welcome.js"></script>
+        <script src="js/dress-up.js"></script>
+        <script src="js/modal-focus.js"></script>
+        <script src="js/start.js"></script>
+
+</body>
+
+</html>
